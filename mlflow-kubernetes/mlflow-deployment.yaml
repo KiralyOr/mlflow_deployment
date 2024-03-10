@@ -22,7 +22,3 @@ spec:
         volumeMounts:
         - name: mlflow-storage
           mountPath: "/mlflow"
-      volumes:
-      - name: mlflow-storage
-        persistentVolumeClaim:
-          claimName: mlflow-pvc
