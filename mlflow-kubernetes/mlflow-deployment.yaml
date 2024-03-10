@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow-server
+spec:
+  selector:
+    matchLabels:
+      app: mlflow-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mlflow-server
+    spec:
+      containers:
+      - name: mlflow-server
+        image: mlflow/mlflow:1.23.1
+        ports:
+        - containerPort: 5000
+        command: ["mlflow", "server"]
+        args: ["--host", "0.0.0.0", "--backend-store-uri", "/mlflow/mlruns", "--default-artifact-root", "/mlflow/mlartifacts"]
+        volumeMounts:
+        - name: mlflow-storage
+          mountPath: "/mlflow"
+      volumes:
+      - name: mlflow-storage
+        persistentVolumeClaim:
+          claimName: mlflow-pvc
