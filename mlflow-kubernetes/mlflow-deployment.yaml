@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mlflow-server
+  namespace: mlflow
 spec:
   selector:
     matchLabels:
@@ -17,12 +18,10 @@ spec:
         image: mlflow/mlflow:1.23.1
         ports:
         - containerPort: 5000
+        env:
+          - name: MLFLOW_BACKEND_STORE_URI
+            value: "file:///mlflow/mlruns"
+          - name: MLFLOW_ARTIFACT_ROOT
+            value: "file:///mlflow/mlartifacts"
         command: ["mlflow", "server"]
-        args: ["--host", "0.0.0.0", "--backend-store-uri", "/mlflow/mlruns", "--default-artifact-root", "/mlflow/mlartifacts"]
-        volumeMounts:
-        - name: mlflow-storage
-          mountPath: "/mlflow"
-      volumes:
-        - name: mlflow-storage
-          persistentVolumeClaim:
-            claimName: mlflow-pvc
+        args: ["--backend-store-uri", "$(MLFLOW_BACKEND_STORE_URI)", "--default-artifact-root", "$(MLFLOW_ARTIFACT_ROOT)", "--host", "0.0.0.0"]
